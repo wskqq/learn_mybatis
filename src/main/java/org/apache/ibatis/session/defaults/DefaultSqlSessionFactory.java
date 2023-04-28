@@ -92,8 +92,13 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     try {
       final Environment environment = configuration.getEnvironment();
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
+      // TODO 根据配置配置的事务类型生成：JDBC-JdbcTransaction(提交和回滚方法有事务提交和回滚逻辑)
+      //  Managed-ManagedTransaction()(提交和回滚方法是空方法，事务交给容器来管理，容器如果不支持，则不支持事务)
+      //  与spring整合之后，交给spring管理事务
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
+      // TODO 根据配置信息生成sql执行器
       final Executor executor = configuration.newExecutor(tx, execType);
+      // TODO 得到DefaultSqlSession
       return new DefaultSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {
       closeTransaction(tx); // may have fetched a connection so lets call close()

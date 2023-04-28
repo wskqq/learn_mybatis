@@ -100,6 +100,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
     parsePendingResultMaps();
     parsePendingCacheRefs();
+    // TODO 将mapper解析的MappedStatement存储到Configuration中
     parsePendingStatements();
   }
 
@@ -121,7 +122,7 @@ public class XMLMapperBuilder extends BaseBuilder {
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
       resultMapElements(context.evalNodes("/mapper/resultMap"));
       sqlElement(context.evalNodes("/mapper/sql"));
-      // TODO 解析sql
+      // TODO 解析增删改查标签sql
       buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
@@ -132,7 +133,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     if (configuration.getDatabaseId() != null) {
       buildStatementFromContext(list, configuration.getDatabaseId());
     }
-    // TODO
+    // TODO 解析增删改查标签
     buildStatementFromContext(list, null);
   }
 
@@ -140,7 +141,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     for (XNode context : list) {
       final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context, requiredDatabaseId);
       try {
-        // TODO
+        // TODO 循环遍历解析标签
         statementParser.parseStatementNode();
       } catch (IncompleteElementException e) {
         configuration.addIncompleteStatement(statementParser);
@@ -435,6 +436,7 @@ public class XMLMapperBuilder extends BaseBuilder {
         // to prevent loading again this resource from the mapper interface
         // look at MapperAnnotationBuilder#loadXmlResource
         configuration.addLoadedResource("namespace:" + namespace);
+        // TODO 每个mapper对应生成一个MapperProxyFactory代理工厂
         configuration.addMapper(boundType);
       }
     }

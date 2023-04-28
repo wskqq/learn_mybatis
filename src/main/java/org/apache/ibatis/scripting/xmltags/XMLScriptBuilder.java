@@ -47,6 +47,7 @@ public class XMLScriptBuilder extends BaseBuilder {
     super(configuration);
     this.context = context;
     this.parameterType = parameterType;
+    // TODO 初始化动态标签信息
     initNodeHandlerMap();
   }
 
@@ -64,11 +65,14 @@ public class XMLScriptBuilder extends BaseBuilder {
   }
 
   public SqlSource parseScriptNode() {
+    // TODO 解析动态标签
     MixedSqlNode rootSqlNode = parseDynamicTags(context);
     SqlSource sqlSource;
     if (isDynamic) {
+      // TODO 带有${}
       sqlSource = new DynamicSqlSource(configuration, rootSqlNode);
     } else {
+      // TODO 带有#{}
       sqlSource = new RawSqlSource(configuration, rootSqlNode, parameterType);
     }
     return sqlSource;
@@ -79,21 +83,26 @@ public class XMLScriptBuilder extends BaseBuilder {
     NodeList children = node.getNode().getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
       XNode child = node.newXNode(children.item(i));
+      // TODO 文本节点，不含动态标签
       if (child.getNode().getNodeType() == Node.CDATA_SECTION_NODE || child.getNode().getNodeType() == Node.TEXT_NODE) {
         String data = child.getStringBody("");
         TextSqlNode textSqlNode = new TextSqlNode(data);
+        // TODO 判断是否带有 ${}，有就代表为动态
         if (textSqlNode.isDynamic()) {
           contents.add(textSqlNode);
           isDynamic = true;
         } else {
+          // TODO 带有 #{}也封装到 StaticTextSqlNode
           contents.add(new StaticTextSqlNode(data));
         }
+        // TODO 元素节点，有动态标签的节点
       } else if (child.getNode().getNodeType() == Node.ELEMENT_NODE) { // issue #628
         String nodeName = child.getNode().getNodeName();
         NodeHandler handler = nodeHandlerMap.get(nodeName);
         if (handler == null) {
           throw new BuilderException("Unknown element <" + nodeName + "> in SQL statement.");
         }
+        // TODO ！！！扩展点，添加新的动态标签及对应的处理类，对应标签的处理器
         handler.handleNode(child, contents);
         isDynamic = true;
       }

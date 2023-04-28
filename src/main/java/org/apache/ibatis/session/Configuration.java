@@ -182,6 +182,7 @@ public class Configuration {
   }
 
   public Configuration() {
+    // TODO 注解一些类别名
     typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
     typeAliasRegistry.registerAlias("MANAGED", ManagedTransactionFactory.class);
 
@@ -666,6 +667,7 @@ public class Configuration {
 
   public ParameterHandler newParameterHandler(MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql) {
     ParameterHandler parameterHandler = mappedStatement.getLang().createParameterHandler(mappedStatement, parameterObject, boundSql);
+    // TODO 扩展点，ParameterHandler
     parameterHandler = (ParameterHandler) interceptorChain.pluginAll(parameterHandler);
     return parameterHandler;
   }
@@ -673,12 +675,14 @@ public class Configuration {
   public ResultSetHandler newResultSetHandler(Executor executor, MappedStatement mappedStatement, RowBounds rowBounds, ParameterHandler parameterHandler,
       ResultHandler resultHandler, BoundSql boundSql) {
     ResultSetHandler resultSetHandler = new DefaultResultSetHandler(executor, mappedStatement, parameterHandler, resultHandler, boundSql, rowBounds);
+    // TODO 扩展点，ResultSetHandler
     resultSetHandler = (ResultSetHandler) interceptorChain.pluginAll(resultSetHandler);
     return resultSetHandler;
   }
 
   public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
     StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
+    // TODO 扩展点：StatementHandler
     statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
     return statementHandler;
   }
@@ -696,13 +700,16 @@ public class Configuration {
     } else if (ExecutorType.REUSE == executorType) {
       executor = new ReuseExecutor(this, transaction);
     } else {
+      // TODO 默认简单执行器
       executor = new SimpleExecutor(this, transaction);
     }
     // TODO 判断是否开启二级缓存
     if (cacheEnabled) {
+      // TODO 使用 装饰器模式
       executor = new CachingExecutor(executor);
     }
-    // TODO 通过自定义插件包装执行器
+    // TODO 在配置文件中配置的插件，在此处执行，是一个扩展点，通过自定义插件包装执行器，通过生成代理对象的方式实现插件功能的作用，
+    //  使用 代理模式, Executor扩展点
     executor = (Executor) interceptorChain.pluginAll(executor);
     return executor;
   }

@@ -131,10 +131,11 @@ public abstract class BaseExecutor implements Executor {
 
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
-    // TODO
+    // TODO  得到sql
     BoundSql boundSql = ms.getBoundSql(parameter);
+    // TODO 获得缓存key
     CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);
-    // TODO
+    // TODO 执行sql查询
     return query(ms, parameter, rowBounds, resultHandler, key, boundSql);
   }
 
@@ -145,16 +146,20 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    // TODO 是否刷新缓存
     if (queryStack == 0 && ms.isFlushCacheRequired()) {
       clearLocalCache();
     }
     List<E> list;
     try {
       queryStack++;
+      // TODO 从缓存获取结果
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
+        // TODO 缓存存在数据时，处理逻辑
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
+        // TODO 缓存不存在数据时，处理逻辑
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
@@ -324,7 +329,7 @@ public abstract class BaseExecutor implements Executor {
     List<E> list;
     localCache.putObject(key, EXECUTION_PLACEHOLDER);
     try {
-      // TODO
+      // TODO 真正执行sql的地方
       list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
     } finally {
       localCache.removeObject(key);

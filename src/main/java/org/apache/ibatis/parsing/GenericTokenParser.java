@@ -74,6 +74,7 @@ public class GenericTokenParser {
           builder.append(src, start, src.length - start);
           offset = src.length;
         } else {
+          // TODO 解析 #{}为？
           builder.append(handler.handleToken(expression.toString()));
           offset = end + closeToken.length();
         }

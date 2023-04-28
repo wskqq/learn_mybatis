@@ -46,9 +46,9 @@ public class SqlSessionFactoryBuilder {
 
   public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
     try {
-      // TODO 解析mybatis配置文件的类
+      // TODO 解析mybatis配置文件，将配置文件流解析成Document对象；创建全局配置对象Configuration
       XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
-      // TODO 执行 xml解析，创建DefaultSqlSessionFactory
+      // TODO 使用解析器执行 xml解析，将配置文件信息及mapper.xml信息解析后存储在Configuration对象中，创建DefaultSqlSessionFactory
       return build(parser.parse());
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error building SqlSession.", e);
